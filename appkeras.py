@@ -16,15 +16,11 @@ modelos_disponibles = ['numerosD1.keras','numerosC2.keras','numerosC3.keras']
 
 # Función para cargar el modelo
 def load_model_from_file(modelo_path):
-    try:
-        modelobien = load_model(modelo_path)
-        modelobien.compile(optimizer='adam',
-                           loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-                           metrics=['accuracy'])
-        return modelobien
-    except Exception as e:
-        st.error(f"Error al cargar el modelo: {e}")
-        return None
+    modelobien = load_model(modelo_path)
+    modelobien.compile(optimizer='adam',
+                        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                        metrics=['accuracy'])
+    return modelobien
 
 # Seleccionar el modelo
 modelo_seleccionado = st.selectbox("Selecciona un modelo", modelos_disponibles)
