@@ -54,7 +54,7 @@ def mostrar_mensaje(probabilidad, modelo_nombre):
     if probabilidad < 0.8:
         return f" ({modelo_nombre}): No identificado adecuadamente, escribe nuevamente"
     else:
-        return f" ({modelo_nombre}): Predicción válida con probabilidad: {probabilidad:.2f}"
+        return f" ({modelo_nombre}): Predicción alta probabilidad, verificar: {probabilidad:.2f}"
 
 if st.button("Predecir"):
     if canvas_result.image_data is not None:
