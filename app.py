@@ -51,7 +51,7 @@ canvas_result = st_canvas(
 
 def mostrar_mensaje(probabilidad, modelo_nombre):
     """Mostrar mensaje si la probabilidad es baja"""
-    if probabilidad < 0.7:
+    if probabilidad < 0.8:
         return f" ({modelo_nombre}): No identificado adecuadamente, escribe nuevamente"
     else:
         return f" ({modelo_nombre}): Predicción válida con probabilidad: {probabilidad:.2f}"
