@@ -49,6 +49,13 @@ canvas_result = st_canvas(
     key="canvas",
 )
 
+def mostrar_mensaje(probabilidad, modelo_nombre):
+    """Mostrar mensaje si la probabilidad es baja"""
+    if probabilidad < 0.7:
+        return f"{modelo_nombre}: No identificado adecuadamente, escribe nuevamente"
+    else:
+        return f"{modelo_nombre}: Predicción válida con probabilidad: {probabilidad:.2f}"
+
 if st.button("Predecir"):
     if canvas_result.image_data is not None:
         # Procesar la imagen dibujada
@@ -85,15 +92,16 @@ if st.button("Predecir"):
         # Mostrar las predicciones de cada modelo
         with col1:
             st.subheader("Modelo D1")
-            st.write(f"Predicción: {predicted_class_d1} con probabilidad: {predicted_probability_d1:.2f}")
+            st.write(mostrar_mensaje(predicted_probability_d1, "Modelo D1"))
 
         with col2:
             st.subheader("Modelo C2")
-            st.write(f"Predicción: {predicted_class_c2} con probabilidad: {predicted_probability_c2:.2f}")
+            st.write(mostrar_mensaje(predicted_probability_c2, "Modelo C2"))
 
         with col3:
             st.subheader("Modelo C3")
-            st.write(f"Predicción: {predicted_class_c3} con probabilidad: {predicted_probability_c3:.2f}")
+            st.write(mostrar_mensaje(predicted_probability_c3, "Modelo C3"))
 
     else:
         st.warning("Por favor, dibuja un número antes de predecir.")
+
