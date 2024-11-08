@@ -10,10 +10,19 @@ from tensorflow.keras.models import load_model
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-# Cargar el modelo
-def load_model_from_file():
+# Cargar el logo
+st.image('logo.gif', use_column_width=True)  # Asegúrate de que el logo esté en la misma carpeta que tu script
+
+# Título
+st.title("ALFREDO DIAZ CLARO 2024")
+
+# Lista de modelos disponibles
+modelos_disponibles = ['numerosD1.keras', 'numerosC2.keras', 'numerosC3.keras']
+
+# Función para cargar los modelos
+def load_model_from_file(modelo_path):
     try:
-        modelobien = load_model(r'C:\Users\USUARIO\Documents\numeros\numerosC.keras')
+        modelobien = load_model(modelo_path)
         modelobien.compile(optimizer='adam',
                            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                            metrics=['accuracy'])
@@ -22,7 +31,10 @@ def load_model_from_file():
         st.error(f"Error al cargar el modelo: {e}")
         return None
 
-modelo = load_model_from_file()
+# Cargar los tres modelos
+modelo_d1 = load_model_from_file('numerosD1.keras')
+modelo_c2 = load_model_from_file('numerosC2.keras')
+modelo_c3 = load_model_from_file('numerosC3.keras')
 
 # Configuración del lienzo
 st.title("Dibuja un número")
@@ -46,20 +58,42 @@ if st.button("Predecir"):
 
         img_array = np.array(img)
 
-        # Invertir los colores (blanco a negro)
-        img_array = 255 - img_array  # Cambiar blanco a negro
+        # Invertir los colores (blanco a negro) si es necesario
+        img_array = 255 - img_array  # Cambiar blanco a negro, depende de cómo entrenaste el modelo
 
         # Normalizar y ajustar la forma
-        img_array = img_array.reshape((28, 28, 1)) / 255.0  # Normalizar y añadir canal
+        img_array = img_array.reshape((28, 28, 1)) / 255.0  # Normalización a rango [0, 1]
         img_array = img_array.reshape((1, 28, 28, 1))  # Ajustar a la forma (1, 28, 28, 1)
 
-        # Mostrar la imagen dibujada en el tamaño correcto
-        st.image(img, caption="Imagen dibujada", use_column_width=False)
+        # Realizar las predicciones para los tres modelos
+        with st.spinner('Realizando predicciones...'):
+            prediction_d1 = modelo_d1.predict(img_array)
+            predicted_class_d1 = np.argmax(prediction_d1)
+            predicted_probability_d1 = np.max(prediction_d1)
 
-        # Realizar la predicción
-        prediction = modelo.predict(img_array)
-        predicted_class = np.argmax(prediction)
+            prediction_c2 = modelo_c2.predict(img_array)
+            predicted_class_c2 = np.argmax(prediction_c2)
+            predicted_probability_c2 = np.max(prediction_c2)
 
-        st.write(f"La predicción es: {predicted_class}")
+            prediction_c3 = modelo_c3.predict(img_array)
+            predicted_class_c3 = np.argmax(prediction_c3)
+            predicted_probability_c3 = np.max(prediction_c3)
+
+        # Crear 3 columnas para mostrar las predicciones de los modelos
+        col1, col2, col3 = st.columns(3)
+
+        # Mostrar las predicciones de cada modelo
+        with col1:
+            st.subheader("Modelo D1")
+            st.write(f"Predicción: {predicted_class_d1} con probabilidad: {predicted_probability_d1:.2f}")
+
+        with col2:
+            st.subheader("Modelo C2")
+            st.write(f"Predicción: {predicted_class_c2} con probabilidad: {predicted_probability_c2:.2f}")
+
+        with col3:
+            st.subheader("Modelo C3")
+            st.write(f"Predicción: {predicted_class_c3} con probabilidad: {predicted_probability_c3:.2f}")
+
     else:
         st.warning("Por favor, dibuja un número antes de predecir.")
