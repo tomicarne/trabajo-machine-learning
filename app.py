@@ -92,7 +92,7 @@ if st.button("Predecir"):
         # Mostrar las predicciones de cada modelo
         with col1:
             st.subheader("Modelo D1")
-            st.write(f"Predicción: {predicted_class_c2} con probabilidad: {predicted_probability_c2:.2f}" + mostrar_mensaje(predicted_probability_d1, "Modelo D1"))
+            st.write(f"Predicción: {predicted_class_c2}" + mostrar_mensaje(predicted_probability_d1, "Modelo D1"))
 
         with col2:
             st.subheader("Modelo C2")
