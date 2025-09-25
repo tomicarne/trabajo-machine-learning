@@ -6,7 +6,7 @@ from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
 # Cargar el logo
-st.image('logo.gif', use_column_width=True)  # Asegúrate de que el logo esté en la misma carpeta que tu script
+st.image('logo.gif', use_container_width=True)  # Asegúrate de que el logo esté en la misma carpeta que tu script
 
 # Título
 st.title("ALFREDO DIAZ CLARO 2024")
@@ -68,3 +68,4 @@ if st.button("Predecir"):
         st.write(f"La predicción es: {predicted_class} con probabilidad: {predicted_probability:.2f}")
     else:
         st.warning("Por favor, dibuja un número antes de predecir.")
+
