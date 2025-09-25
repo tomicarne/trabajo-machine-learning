@@ -58,7 +58,7 @@ if st.button("Predecir"):
         img_array = img_array.reshape((1, 28, 28, 1))  # Ajustar a la forma (1, 28, 28, 1)
 
         # Mostrar la imagen dibujada en el tamaño correcto
-        st.image(img, caption="Imagen dibujada", use_column_width=False)
+        st.image(img, caption="Imagen dibujada", use_container_width=False)
 
         # Realizar la predicción
         prediction = modelo.predict(img_array)
@@ -68,4 +68,5 @@ if st.button("Predecir"):
         st.write(f"La predicción es: {predicted_class} con probabilidad: {predicted_probability:.2f}")
     else:
         st.warning("Por favor, dibuja un número antes de predecir.")
+
 
