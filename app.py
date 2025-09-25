@@ -14,7 +14,7 @@ import os
 st.image('logo.gif', width='stretch')  # Usar "container" en lugar de use_container_width
 
 # Título
-st.title("ALFREDO DIAZ CLARO 2024")
+st.title("ALFREDO DIAZ CLARO 2025")
 
 # Lista de modelos disponibles
 modelos_disponibles = ['numerosD1.keras', 'numerosC2.keras', 'numerosC3.keras']
@@ -110,5 +110,6 @@ if st.button("Predecir"):
 
     else:
         st.warning("⚠️ Por favor, dibuja un número antes de predecir.")
+
 
 
