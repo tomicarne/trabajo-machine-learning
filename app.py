@@ -1,4 +1,3 @@
-```python
 # pip install tensorflow==2.17.0
 # pip install streamlit
 # pip install streamlit-drawable-canvas
@@ -122,4 +121,3 @@ if st.button("Predecir"):
 
     else:
         st.warning("⚠️ Por favor, dibuja un número antes de predecir.")
-```
