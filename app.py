@@ -1,6 +1,8 @@
+```python
 # pip install tensorflow==2.17.0
 # pip install streamlit
 # pip install streamlit-drawable-canvas
+# pip install pillow pandas
 
 import streamlit as st
 import tensorflow as tf
@@ -9,44 +11,41 @@ from tensorflow.keras.models import load_model
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 import os
+import pandas as pd
 
 # Mostrar logo
-st.image('logo.gif', width='stretch')  # Usar "container" en lugar de use_container_width
+st.image("logo.gif", use_container_width=True)
 
 # Título
-st.title("ALFREDO DIAZ CLARO 2025 -")
+st.title("🧮 Reconocimiento de números escritos a mano - Alfredo Díaz Claro 2025")
 
 # Lista de modelos disponibles
-modelos_disponibles = ['numerosD1.keras', 'numerosC2.keras', 'numerosC3.keras']
+modelos_disponibles = ["numerosD1.keras", "numerosC2.keras", "numerosC3.keras"]
 
-# Función para cargar modelos con verificación
+# Función para cargar modelos con caché (más eficiente)
+@st.cache_resource
 def load_model_from_file(modelo_path):
     if not os.path.exists(modelo_path):
         st.error(f"❌ Archivo no encontrado: {modelo_path}")
         return None
     try:
         modelobien = load_model(modelo_path)
-        modelobien.compile(
-            optimizer='adam',
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-            metrics=['accuracy']
-        )
-        return modelobien
+        return modelobien  # No es necesario recompilar si solo es para predicción
     except Exception as e:
         st.error(f"❌ Error al cargar el modelo '{modelo_path}': {e}")
         return None
 
 # Cargar los modelos
-modelo_d1 = load_model_from_file('numerosD1.keras')
-modelo_c2 = load_model_from_file('numerosC2.keras')
-modelo_c3 = load_model_from_file('numerosC3.keras')
+modelo_d1 = load_model_from_file("numerosD1.keras")
+modelo_c2 = load_model_from_file("numerosC2.keras")
+modelo_c3 = load_model_from_file("numerosC3.keras")
 
 # Verificar si todos los modelos se cargaron correctamente
 if not all([modelo_d1, modelo_c2, modelo_c3]):
     st.stop()  # Detiene la ejecución si faltan modelos
 
 # Lienzo para dibujar
-st.title("🖌️ Dibuja un número")
+st.subheader("🖌️ Dibuja un número")
 canvas_result = st_canvas(
     fill_color="white",
     stroke_width=10,
@@ -69,15 +68,18 @@ def mostrar_mensaje(probabilidad, modelo_nombre):
 if st.button("Predecir"):
     if canvas_result.image_data is not None:
         # Procesar la imagen
-        img = Image.fromarray(canvas_result.image_data.astype('uint8'))
-        img = img.convert('L')  # Escala de grises
+        img = Image.fromarray(canvas_result.image_data.astype("uint8"))
+        img = img.convert("L")  # Escala de grises
         img = img.resize((28, 28))  # Redimensionar a 28x28
 
+        # Mostrar la imagen procesada
+        st.image(img, caption="Imagen procesada (28x28)", use_container_width=False)
+
         img_array = np.array(img)
-        img_array = 255 - img_array  # Invertir colores
+        img_array = 255 - img_array  # Invertir colores (ajustar según entrenamiento)
         img_array = img_array.reshape((1, 28, 28, 1)) / 255.0  # Normalizar
 
-        with st.spinner('🔍 Realizando predicciones...'):
+        with st.spinner("🔍 Realizando predicciones..."):
             # Modelo D1
             prediction_d1 = modelo_d1.predict(img_array)
             predicted_class_d1 = np.argmax(prediction_d1)
@@ -108,9 +110,16 @@ if st.button("Predecir"):
             st.subheader("🧠 Modelo C3")
             st.write(f"Predicción: {predicted_class_c3}" + mostrar_mensaje(predicted_probability_c3, "C3"))
 
+        # Mostrar resumen en tabla
+        resultados = pd.DataFrame({
+            "Modelo": ["D1", "C2", "C3"],
+            "Predicción": [predicted_class_d1, predicted_class_c2, predicted_class_c3],
+            "Confianza": [predicted_probability_d1, predicted_probability_c2, predicted_probability_c3]
+        })
+
+        st.subheader("📊 Resumen de predicciones")
+        st.table(resultados)
+
     else:
         st.warning("⚠️ Por favor, dibuja un número antes de predecir.")
-
-
-
-
+```
