@@ -25,8 +25,12 @@ modelo_seleccionado = st.selectbox("Selecciona un modelo", modelos_disponibles)
 # Cargar el modelo seleccionado
 @st.cache_resource
 def load_model_from_file(modelo_path):
-    modelobien = load_model(modelo_path)
-    return modelobien
+    try:
+        modelo = load_model(modelo_path, compile=False)
+        return modelo
+    except Exception as e:
+        st.error(f"❌ Error al cargar el modelo '{modelo_path}': {e}")
+        st.stop()
 
 modelo = load_model_from_file(modelo_seleccionado)
 
@@ -67,3 +71,4 @@ if st.button("Predecir"):
         st.success(f"Predicción: **{predicted_class}** con probabilidad: **{predicted_probability:.2f}**")
     else:
         st.warning("Por favor, dibuja un número antes de predecir.")
+
