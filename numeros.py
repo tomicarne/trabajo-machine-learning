@@ -1,28 +1,39 @@
 #pip install streamlit
 import streamlit as st
+import tensorflow as tf
 import numpy as np
-from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import load_model
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
+import os
 
-# Cargar el modelo
-def load_model():
-    # Cargar el modelo JSON
-    with open('numeros1.weghts.json', 'r') as json_file:
-        model_json = json_file.read()
-    modelo = model_from_json(model_json)
-    
-    # Cargar los pesos
-    modelo.load_weights('numeros1.weights.h5')  # Actualizado a .weights.h5
-    
-    return modelo
+# Mostrar logo si existe
+if os.path.exists('logo.gif'):
+    st.image('logo.gif', use_container_width=True)
+else:
+    st.warning("No se encontró 'logo.gif'. Asegúrate de que esté en la carpeta.")
 
-modelo = load_model()
+# Título
+st.title("ALFREDO DIAZ CLARO 2024")
 
-# Configuración del lienzo
-st.title("Dibuja un número")
+# Detectar automáticamente archivos .keras en la carpeta
+modelos_disponibles = [f for f in os.listdir() if f.endswith('.keras')]
+
+# Selección del modelo
+modelo_seleccionado = st.selectbox("Selecciona un modelo", modelos_disponibles)
+
+# Cargar el modelo seleccionado
+@st.cache_resource
+def load_model_from_file(modelo_path):
+    modelobien = load_model(modelo_path)
+    return modelobien
+
+modelo = load_model_from_file(modelo_seleccionado)
+
+# Sección para dibujar
+st.subheader("Dibuja un número")
 canvas_result = st_canvas(
-    fill_color="white",  # Color de fondo
+    fill_color="white",
     stroke_width=10,
     stroke_color="black",
     background_color="white",
@@ -32,18 +43,27 @@ canvas_result = st_canvas(
     key="canvas",
 )
 
+# Botón para predecir
 if st.button("Predecir"):
     if canvas_result.image_data is not None:
-        # Procesar la imagen dibujada
-        img = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGB')
-        img = img.convert('L')  # Convertir a escala de grises
-        img = img.resize((28, 28))  # Redimensionar
+        # Convertir la imagen
+        img = Image.fromarray(canvas_result.image_data.astype('uint8'))
+        img = img.convert('L')
+        img = img.resize((28, 28))
+
         img_array = np.array(img)
-        img_array = img_array.reshape((1, 28, 28, 1)) / 255.0  # Normalizar y ajustar forma
+        img_array = 255 - img_array  # Invertir colores
+
+        img_array = img_array.reshape((1, 28, 28, 1)) / 255.0  # Normalizar
+
+        # Mostrar imagen procesada
+        st.image(img, caption="Imagen procesada", width=150)
 
         # Realizar la predicción
         prediction = modelo.predict(img_array)
         predicted_class = np.argmax(prediction)
+        predicted_probability = np.max(prediction)
 
-        st.write(f"La predicción es: {predicted_class}")
-
+        st.success(f"Predicción: **{predicted_class}** con probabilidad: **{predicted_probability:.2f}**")
+    else:
+        st.warning("Por favor, dibuja un número antes de predecir.")
